@@ -1,2 +1,2 @@
-# wsuwp-plugin-public-pending
-Keep posts/pages in pending status live with last published content
+# wsuwp-plugin-people-api
+Add a custom API endpoint for retrieving profiles from the people directory.
