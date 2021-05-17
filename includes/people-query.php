@@ -3,16 +3,6 @@
 
 class People_Query
 {
-    public function init()
-    {
-        add_action('rest_api_init', function () {
-            register_rest_route('peopleapi/v1', '/people', array(
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => array(__CLASS__, 'get_people')
-            ));
-        });
-    }
-
     /**
      * Return a json array of profiles from the people directory based on request parameters.
      *
@@ -108,7 +98,7 @@ class People_Query
         }
 
         // return profiles
-        return json_encode($profiles);
+        return json_encode( $profiles );
     }
 
 
@@ -139,6 +129,17 @@ class People_Query
 		}
 
         return $photo_urls;
+    }
+
+
+    public function init()
+    {
+        add_action('rest_api_init', function () {
+            register_rest_route('peopleapi/v1', '/people', array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array(__CLASS__, 'get_people')
+            ));
+        });
     }
 }
 
