@@ -112,21 +112,21 @@ class People_Query
     private static function get_photo_urls($postId, $photos){
         $photo_urls = null;
 
-		if ( $photos && is_array( $photos ) ) {
-			foreach ( $photos as $i => $photo_id ) {
-				if ( is_string( get_post_status( $photo_id ) ) ) {
+        if ( $photos && is_array( $photos ) ) {
+            foreach ( $photos as $i => $photo_id ) {
+                if ( is_string( get_post_status( $photo_id ) ) ) {
                     $photo_urls = array();
 
                     foreach(get_intermediate_image_sizes() as $size){
                         $photo_urls[$size] = wp_get_attachment_image_src( $photos[ $i ], $size )[0];
                     }
 
-					$photo_urls['full'] = wp_get_attachment_image_src( $photos[ $i ], 'full' )[0];
+                    $photo_urls['full'] = wp_get_attachment_image_src( $photos[ $i ], 'full' )[0];
 
-					break; // break, so we only return the first image
-				}
-			}
-		}
+                    break; // break, so we only return the first image
+                }
+            }
+        }
 
         return $photo_urls;
     }
