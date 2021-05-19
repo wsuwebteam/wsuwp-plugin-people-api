@@ -17,37 +17,55 @@ class People_Query
      *
      *     nid Comma delimited list of people network ids
      *
-     *     university_category Comma delimited list of wsuwp_university_category taxonomy slugs
+     *     university-category Comma delimited list of wsuwp_university_category taxonomy slugs
      *
-     *     university_location Comma delimited list of wsuwp_university_location taxonomy slugs
+     *     university-location Comma delimited list of wsuwp_university_location taxonomy slugs
      *
-     *     university_organization Comma delimited list of wsuwp_university_org taxonomy slugs
+     *     university-organization Comma delimited list of wsuwp_university_org taxonomy slugs
+     *
+     *     size Photo size (thumbnail, medium, medium_large, large, full).  Defaults to medium.
      * }
      * @return string JSON encoded string of people profiles.
      */
     public static function get_people(\WP_REST_Request $request)
     {
+        // setup variables
         $profiles = array();
-        $count = $request['count'] ?? 10;
+        $params = array(
+            'count' => $request['count'] ? sanitize_text_field($request['count']) : 10,
+            'page' => $request['page']? sanitize_text_field($request['page']) : 1,
+            'nid' => sanitize_text_field($request['nid']),
+            'university_category' => sanitize_text_field($request['university-category']),
+            'university_location' => sanitize_text_field($request['university-location']),
+            'university_organization' => sanitize_text_field($request['university-organization']),
+            'size' => $request['size'] ? sanitize_text_field($request['size']) : 'medium'
+        );
         $taxonomies = array(
-            'wsuwp_university_category' => 'university_category',
-            'wsuwp_university_location' => 'university_location',
-            'wsuwp_university_org' => 'university_organization'
+            'wsuwp_university_category' => 'university-category',
+            'wsuwp_university_location' => 'university-location',
+            'wsuwp_university_org' => 'university-organization'
+        );
+        $image_sizes = array(
+            'thumbnail',
+            'medium',
+            'medium_large',
+            'large',
+            'full'
         );
 
 
         // build query args
         $args = array(
             'post_type' => 'wsuwp_people_profile',
-            'posts_per_page' => strcasecmp($count, 'All') == 0 ? -1 : $count,
-            'paged' => $request['page'] ?? 1,
+            'posts_per_page' => strcasecmp($params['count'], 'All') == 0 ? -1 : $params['count'],
+            'paged' => $params['page'],
         );
 
-        if ($request['nid']) {
+        if ($params['nid']) {
             $args['meta_query'] = array(
                 array(
                     'key' => '_wsuwp_profile_ad_nid',
-                    'value' => array_map('trim', explode(',', $request['nid'])),
+                    'value' => array_map('trim', explode(',', $params['nid'])),
                     'compare' => 'IN',
                 ),
             );
@@ -56,12 +74,12 @@ class People_Query
         foreach($taxonomies as $key => $value){
             $tax_queries = array();
 
-            if ($request[$value]) {
+            if ($params[$value]) {
                 array_push($tax_queries,
                     array(
                         'taxonomy' => $key,
                         'field' => 'slug',
-                        'terms' => array_map('trim', explode(',', $request[$value])),
+                        'terms' => array_map('trim', explode(',', $params[$value])),
                     ),
                 );
             }
@@ -81,7 +99,6 @@ class People_Query
                 $id = get_the_ID();
                 $profile = array(
                     'nid' => get_post_meta($id, '_wsuwp_profile_ad_nid', true),
-                    'photo' => self::get_photo_urls($id, get_post_meta($id, '_wsuwp_profile_photos', true)),
                     'name' => get_the_title(),
                     'title' => get_post_meta($id, '_wsuwp_profile_title', true) ?? get_post_meta($id, '_wsuwp_profile_ad_title', true),
                     'office' => get_post_meta($id, '_wsuwp_profile_alt_office', true) ?? get_post_meta($id, '_wsuwp_profile_ad_office', true),
@@ -89,9 +106,13 @@ class People_Query
                     'address' => get_post_meta($id, '_wsuwp_profile_alt_address', true) ?? get_post_meta($id, '_wsuwp_profile_ad_address', true),
                     'phone' => get_post_meta($id, '_wsuwp_profile_alt_phone', true) ?? get_post_meta($id, '_wsuwp_profile_ad_phone', true),
                     'degree' => get_post_meta($id, '_wsuwp_profile_degree', true),
-                    'bio' => get_the_content(),
                     'website' => get_post_meta($id, '_wsuwp_profile_website', true),
+                    'university_location' => self::get_taxonomy_names(get_the_terms( $id, 'wsuwp_university_location' )),
+                    'university_organization' => self::get_taxonomy_names(get_the_terms( $id, 'wsuwp_university_org' )),
+                    'bio' => apply_filters('the_content', get_the_content()),
+                    'photo_sizes' => self::get_photo_urls($id, $image_sizes, get_post_meta($id, '_wsuwp_profile_photos', true)),
                 );
+                $profile['photo'] = $profile['photo_sizes'][$params['size']];
 
                 array_push($profiles, $profile);
             }
@@ -109,7 +130,7 @@ class People_Query
      * @param array $photos List of image ids.
      * @return array
      */
-    private static function get_photo_urls($postId, $photos){
+    private static function get_photo_urls($postId, $sizes, $photos){
         $photo_urls = null;
 
         if ( $photos && is_array( $photos ) ) {
@@ -117,11 +138,9 @@ class People_Query
                 if ( is_string( get_post_status( $photo_id ) ) ) {
                     $photo_urls = array();
 
-                    foreach(get_intermediate_image_sizes() as $size){
+                    foreach($sizes as $size){
                         $photo_urls[$size] = wp_get_attachment_image_src( $photos[ $i ], $size )[0];
                     }
-
-                    $photo_urls['full'] = wp_get_attachment_image_src( $photos[ $i ], 'full' )[0];
 
                     break; // break, so we only return the first image
                 }
@@ -129,6 +148,24 @@ class People_Query
         }
 
         return $photo_urls;
+    }
+
+    /**
+     * Return an key-value-pair of taxonomy slugs and names
+     *
+     * @param array<WP_Term> $terms
+     * @return array
+     */
+    private static function get_taxonomy_names( $terms ){
+        $result = array();
+
+        if ( $terms && is_array( $terms ) ) {
+            foreach ( $terms as $t ) {
+                $result[$t->slug] = $t->name;
+            }
+        }
+
+        return $result;
     }
 
 
