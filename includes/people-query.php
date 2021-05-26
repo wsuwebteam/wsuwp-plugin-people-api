@@ -41,9 +41,9 @@ class People_Query
             'size' => $request['size'] ? sanitize_text_field($request['size']) : 'medium'
         );
         $taxonomies = array(
-            'wsuwp_university_category' => 'university-category',
-            'wsuwp_university_location' => 'university-location',
-            'wsuwp_university_org' => 'university-organization'
+            'wsuwp_university_category' => 'university_category',
+            'wsuwp_university_location' => 'university_location',
+            'wsuwp_university_org' => 'university_organization'
         );
         $image_sizes = array(
             'thumbnail',
