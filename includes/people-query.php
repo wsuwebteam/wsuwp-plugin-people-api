@@ -161,7 +161,10 @@ class People_Query
 
         if ( $terms && is_array( $terms ) ) {
             foreach ( $terms as $t ) {
-                $result[$t->slug] = $t->name;
+                array_push($result, array(
+                    'slug' => $t->slug,
+                    'name' => $t->name
+                ));
             }
         }
 
