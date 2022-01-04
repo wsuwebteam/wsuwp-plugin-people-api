@@ -216,12 +216,14 @@ class People_Query {
 				$nids = array_map( 'trim', explode( ',', $ordered_nids ) );
 
 				foreach ( $nids as $nid ) {
-					$key = array_search( $nid, array_column( $profiles, 'nid' ) );
+                    if($nid){
+                        $key = array_search( $nid, array_column( $profiles, 'nid' ) );
 
-					if ( $key ) {
-						$profile = array_slice( $profiles, $key, 1 );
-						array_push( $ordered_profiles, $profile );
-					}
+                        if ( $key !== false ) {
+                            $profile = array_splice( $profiles, $key, 1 )[0];
+                            array_push( $ordered_profiles, $profile );
+                        }
+                    }
 				}
 			}
 
