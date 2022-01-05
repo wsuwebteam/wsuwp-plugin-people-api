@@ -103,6 +103,7 @@ class People_Query {
 				$query->the_post();
 				$id = get_the_ID();
 				$profile = array(
+					'post_id' => $id,
 					'nid' => get_post_meta( $id, '_wsuwp_profile_ad_nid', true ),
 					'name' => get_the_title(),
 					'title' => get_post_meta( $id, '_wsuwp_profile_title', true ) ?? get_post_meta( $id, '_wsuwp_profile_ad_title', true ),
@@ -216,14 +217,14 @@ class People_Query {
 				$nids = array_map( 'trim', explode( ',', $ordered_nids ) );
 
 				foreach ( $nids as $nid ) {
-                    if($nid){
-                        $key = array_search( $nid, array_column( $profiles, 'nid' ) );
+					if ( $nid ) {
+						$key = array_search( $nid, array_column( $profiles, 'nid' ), true );
 
-                        if ( $key !== false ) {
-                            $profile = array_splice( $profiles, $key, 1 )[0];
-                            array_push( $ordered_profiles, $profile );
-                        }
-                    }
+						if ( false !== $key ) {
+							$profile = array_splice( $profiles, $key, 1 )[0];
+							array_push( $ordered_profiles, $profile );
+						}
+					}
 				}
 			}
 
