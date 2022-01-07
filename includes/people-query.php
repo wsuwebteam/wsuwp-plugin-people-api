@@ -270,7 +270,7 @@ class People_Query {
 			$results
 		);
 
-		return wp_json_encode( $terms );
+		return wp_json_encode( (array) $terms );
 	}
 
 
