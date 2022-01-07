@@ -258,6 +258,9 @@ class People_Query {
 
 		$results = get_terms( $args );
 
+        /// Leaving this here as a reference:
+        /// For some crazy reason this was returning on object on production instead of an array...at least I think it was this 🤪.
+        /// I also added the permission_callback in the same commit.
 		// $terms = array_map(
 		// 	function( $result ) {
 		// 		return array(
