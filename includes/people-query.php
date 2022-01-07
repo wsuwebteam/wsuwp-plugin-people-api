@@ -61,7 +61,7 @@ class People_Query {
 		// build query args
 		$args = array(
 			'post_type' => 'wsuwp_people_profile',
-			'posts_per_page' => strcasecmp( $params['count'], 'All' ) == 0 ? -1 : $params['count'],
+			'posts_per_page' => strcasecmp( $params['count'], 'All' ) === 0 ? -1 : $params['count'],
 			'paged' => $params['page'],
 		);
 
@@ -130,9 +130,8 @@ class People_Query {
 			$profiles = self::get_ordered_profiles( $profiles, $params['profile_order'] );
 		}
 
-		// return profiles
 		// return $profiles;
-		return json_encode( $profiles );
+		return wp_json_encode( $profiles );
 	}
 
 
@@ -143,7 +142,7 @@ class People_Query {
 	 * @param array $photos List of image ids.
 	 * @return array
 	 */
-	private static function get_photo_urls( $postId, $sizes, $photos ) {
+	private static function get_photo_urls( $post_id, $sizes, $photos ) {
 		$photo_urls = null;
 
 		if ( $photos && is_array( $photos ) ) {
@@ -164,7 +163,7 @@ class People_Query {
 	}
 
 
-	private static function get_photo_srcset( $postId, $photos ) {
+	private static function get_photo_srcset( $post_id, $photos ) {
 		$srcset = null;
 
 		if ( $photos && is_array( $photos ) ) {
@@ -271,7 +270,7 @@ class People_Query {
 			$results
 		);
 
-		return json_encode( $terms );
+		return wp_json_encode( $terms );
 	}
 
 
