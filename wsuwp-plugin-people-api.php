@@ -3,7 +3,7 @@
  * Plugin Name: WSUWP People API
  * Plugin URI: https://github.com/wsuwebteam/wsuwp-plugin-people-api
  * Description: Add a custom API endpoint for retrieving profiles from the people directory.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Requires PHP: 7.0
  * Author: Washington State University, Dan White
  * Author URI: https://web.wsu.edu/
@@ -13,7 +13,7 @@
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 // Initiate plugin
