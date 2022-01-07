@@ -258,19 +258,31 @@ class People_Query {
 
 		$results = get_terms( $args );
 
-		$terms = array_map(
-			function( $result ) {
-				return array(
+		// $terms = array_map(
+		// 	function( $result ) {
+		// 		return array(
+		// 			'term_id' => $result->term_id,
+		// 			'name' => $result->name,
+		// 			'slug' => $result->slug,
+		// 			'taxonomy' => $result->taxonomy,
+		// 		);
+		// 	},
+		// 	$results
+		// );
+
+		foreach ( $results as $result ) {
+			array_push(
+				$terms,
+				array(
 					'term_id' => $result->term_id,
 					'name' => $result->name,
 					'slug' => $result->slug,
 					'taxonomy' => $result->taxonomy,
-				);
-			},
-			$results
-		);
+				)
+			);
+		}
 
-		return wp_json_encode( (array) $terms );
+		return wp_json_encode( $terms );
 	}
 
 
@@ -284,6 +296,7 @@ class People_Query {
 					array(
 						'methods' => \WP_REST_Server::READABLE,
 						'callback' => array( __CLASS__, 'get_people' ),
+						'permission_callback' => '__return_true',
 					)
 				);
 
@@ -293,6 +306,7 @@ class People_Query {
 					array(
 						'methods' => \WP_REST_Server::READABLE,
 						'callback' => array( __CLASS__, 'get_terms' ),
+						'permission_callback' => '__return_true',
 					)
 				);
 			}
