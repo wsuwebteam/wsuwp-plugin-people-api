@@ -75,9 +75,10 @@ class People_Query {
 			);
 		}
 
-		foreach ( $taxonomies as $key => $value ) {
-			$tax_queries = array();
+		$tax_queries = array();
 
+		foreach ( $taxonomies as $key => $value ) {
+			
 			if ( $params[ $value ] ) {
 				array_push(
 					$tax_queries,
@@ -89,9 +90,11 @@ class People_Query {
 				);
 			}
 
-			if ( ! empty( $tax_queries ) ) {
-				$args['tax_query'] = $tax_queries;
-			}
+		}
+
+		if ( ! empty( $tax_queries ) ) {
+			$args['tax_query'] = $tax_queries;
+			$args['tax_query']['relation'] = 'AND';
 		}
 
 		// query WordPress
