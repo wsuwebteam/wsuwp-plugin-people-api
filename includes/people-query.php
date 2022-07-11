@@ -43,12 +43,16 @@ class People_Query {
 			'university_location' => sanitize_text_field( $request['university-location'] ),
 			'university_organization' => sanitize_text_field( $request['university-organization'] ),
 			'photo_size' => $request['photo-size'] ? sanitize_text_field( $request['photo-size'] ) : 'medium',
+			'tag'  => sanitize_text_field( $request['tag'] ),
+			'research_interest' => sanitize_text_field( $request['research-interest'] ),
 		);
 		$taxonomies = array(
 			'classification' => 'classification',
 			'wsuwp_university_category' => 'university_category',
 			'wsuwp_university_location' => 'university_location',
 			'wsuwp_university_org' => 'university_organization',
+			'post_tag' => 'tag',
+			'wsuwp_research_interest' => 'research_interest',
 		);
 		$image_sizes = array(
 			'thumbnail',
@@ -120,6 +124,7 @@ class People_Query {
 					'category' => array_merge( self::get_taxonomy_names( get_the_terms( $id, 'category' ) ), self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_university_category' ) ) ),
 					'university_location' => self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_university_location' ) ),
 					'university_organization' => self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_university_org' ) ),
+					'research_interest' => self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_research_interest' ) ),
 					'tag' => self::get_taxonomy_names( get_the_terms( $id, 'post_tag' ) ),
 					'bio' => apply_filters( 'the_content', get_the_content() ),
 					'photo_sizes' => self::get_photo_urls( $id, $image_sizes, get_post_meta( $id, '_wsuwp_profile_photos', true ) ),
