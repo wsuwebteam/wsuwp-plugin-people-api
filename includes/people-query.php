@@ -190,7 +190,7 @@ class People_Query {
 
 		// is an array of ids. Pulled from _wsuwp_profile_photos
 		if ( ! empty( $photo_meta ) && is_array( $photo_meta ) && is_int( $photo_meta[0] ) ) {
-			return self::get_photo_srcset( $post_id, $sizes, $photo_meta );
+			return self::get_photo_srcset( $post_id, $photo_meta );
 		}
 
 		// is a string containing photo_srcset already. Pulled from _wsuwp_fallback_photo_srcset
