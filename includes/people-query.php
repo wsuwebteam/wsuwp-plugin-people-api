@@ -120,15 +120,15 @@ class People_Query {
 					'post_id' => $id,
 					'nid' => self::get_first_post_meta( $id, array( '_wsuwp_nid', '_wsuwp_profile_ad_nid' ) ),
 					'name' => trim( $name ),
-					'first_name' => trim( self::get_first_post_meta( $id, array( 'wsuwp_first_name', '_wsuwp_fallback_first_name', '_wsuwp_profile_ad_name_first' ) ) ),
-					'last_name' => trim( self::get_first_post_meta( $id, array( 'wsuwp_last_name', '_wsuwp_fallback_last_name', '_wsuwp_profile_ad_name_last' ) ) ),
+					'first_name' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_first_name', '_wsuwp_fallback_first_name', '_wsuwp_profile_ad_name_first' ) ) ),
+					'last_name' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_last_name', '_wsuwp_fallback_last_name', '_wsuwp_profile_ad_name_last' ) ) ),
 					'title' => self::get_first_post_meta( $id, array( 'wsuwp_title', '_wsuwp_fallback_title', '_wsuwp_profile_title', '_wsuwp_profile_ad_title' ) ),
-					'email' => trim( self::get_first_post_meta( $id, array( 'wsuwp_email', '_wsuwp_fallback_email', '_wsuwp_profile_alt_email', '_wsuwp_profile_ad_email' ) ) ),
-					'phone' => trim( self::get_first_post_meta( $id, array( 'wsuwp_phone', '_wsuwp_fallback_phone', '_wsuwp_profile_alt_phone', '_wsuwp_profile_ad_phone' ) ) ),
-					'office' => trim( self::get_first_post_meta( $id, array( 'wsuwp_office', '_wsuwp_fallback_office', '_wsuwp_profile_alt_office', '_wsuwp_profile_ad_office' ) ) ),
-					'address' => trim( self::get_first_post_meta( $id, array( 'wsuwp_address', '_wsuwp_fallback_address', '_wsuwp_profile_alt_address', '_wsuwp_profile_ad_address' ) ) ),
+					'email' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_email', '_wsuwp_fallback_email', '_wsuwp_profile_alt_email', '_wsuwp_profile_ad_email' ) ) ),
+					'phone' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_phone', '_wsuwp_fallback_phone', '_wsuwp_profile_alt_phone', '_wsuwp_profile_ad_phone' ) ) ),
+					'office' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_office', '_wsuwp_fallback_office', '_wsuwp_profile_alt_office', '_wsuwp_profile_ad_office' ) ) ),
+					'address' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_address', '_wsuwp_fallback_address', '_wsuwp_profile_alt_address', '_wsuwp_profile_ad_address' ) ) ),
 					'degree' => self::get_first_post_meta( $id, array( 'wsuwp_degree', '_wsuwp_fallback_degree', '_wsuwp_profile_degree' ) ),
-					'website' => trim( self::get_first_post_meta( $id, array( 'wsuwp_website', '_wsuwp_fallback_website', '_wsuwp_profile_website' ) ) ),
+					'website' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_website', '_wsuwp_fallback_website', '_wsuwp_profile_website' ) ) ),
 					'bio' => apply_filters( 'the_content', get_the_content() ),
 
 					'classification' => self::get_taxonomy_names( get_the_terms( $id, 'classification' ) ),
@@ -151,6 +151,13 @@ class People_Query {
 		}
 
 		return $profiles;
+	}
+
+
+	private static function custom_trim( $input ) {
+
+		return trim( $input, " \t\n\r\0\x0B\xC2\xA0" ); // extend to include non-breaking spaces
+
 	}
 
 
