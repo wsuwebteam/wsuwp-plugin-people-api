@@ -2,7 +2,7 @@
 
 class Plugin {
 
-	protected static $version = '1.1.2';
+	protected static $version = '1.1.3';
 
 	public static function get( $property ) {
 
