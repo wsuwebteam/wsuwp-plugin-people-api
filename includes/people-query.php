@@ -360,6 +360,7 @@ class People_Query {
 		$args = array(
 			'taxonomy' => array_map( 'trim', explode( ',', $params['taxonomy'] ) ),
 			'number' => $params['count'],
+			'hide_empty' => false,
 			'name__like' => $params['search_term'],
 		);
 
@@ -445,7 +446,7 @@ class People_Query {
 	 */
 	public static function create_organization( \WP_REST_Request $request ) {
 
-		header( 'Access-Control-Allow-Origin: *' ); // REMOVE
+		// header( 'Access-Control-Allow-Origin: *' ); // REMOVE
 
 		$params = $request->get_body_params();
 
@@ -478,7 +479,7 @@ class People_Query {
 
 	public static function sync_organization( \WP_REST_Request $request ) {
 
-		header( 'Access-Control-Allow-Origin: *' ); // REMOVE
+		// header( 'Access-Control-Allow-Origin: *' ); // REMOVE
 
 		// get params
 		$params = $request->get_body_params();
