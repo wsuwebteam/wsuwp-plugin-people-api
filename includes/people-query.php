@@ -114,6 +114,7 @@ class People_Query {
 			while ( $query->have_posts() ) {
 				$query->the_post();
 				$id = get_the_ID();
+				$url = get_the_permalink();
 				$display_name = trim( self::get_first_post_meta( $id, array( 'wsuwp_display_name', '_wsuwp_fallback_display_name' ) ) );
 				$name = empty( $display_name ) ? get_the_title() : $display_name;
 				$profile = array(
@@ -141,6 +142,8 @@ class People_Query {
 
 					'photo_sizes' => self::resolve_photo_urls( $id, $image_sizes, self::get_first_post_meta( $id, array( 'wsuwp_photo', '_wsuwp_fallback_photo_sizes', '_wsuwp_profile_photos' ) ) ),
 					'photo_srcset' => self::resolve_photo_srcset( $id, self::get_first_post_meta( $id, array( 'wsuwp_photo', '_wsuwp_fallback_photo_srcset', '_wsuwp_profile_photos' ) ) ),
+
+					'profile_url' => $url,
 				);
 				$profile['photo'] = $profile['photo_sizes'][ $params['photo_size'] ];
 
