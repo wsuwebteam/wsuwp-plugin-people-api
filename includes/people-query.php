@@ -322,7 +322,10 @@ class People_Query {
 			usort(
 				$profiles,
 				function( $p1, $p2 ) {
-					return strcasecmp( end( explode( ' ', trim( $p1['name'] ) ) ), end( explode( ' ', trim( $p2['name'] ) ) ) );
+					$p1_last_name = ! empty( $p1['last_name'] ) ? $p1['last_name'] : end( explode( ' ', trim( $p1['name'] ) ) );
+					$p2_last_name = ! empty( $p2['last_name'] ) ? $p2['last_name'] : end( explode( ' ', trim( $p2['name'] ) ) );
+
+					return strcasecmp( $p1_last_name, $p2_last_name );
 				}
 			);
 
