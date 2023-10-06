@@ -33,6 +33,8 @@ class Plugin {
 
 	public function init() {
 
+		require_once self::get( 'plugin_dir') . 'classes/directories.php';
+
 		require_once __DIR__ . '/people-query.php';
 
 	}
