@@ -45,7 +45,17 @@ class People_Query {
 			'photo_size' => $request['photo-size'] ? sanitize_text_field( $request['photo-size'] ) : 'medium',
 			'tag'  => sanitize_text_field( $request['tag'] ),
 			'research_interest' => sanitize_text_field( $request['research-interest'] ),
+			'directory' => $request['directory'] ? sanitize_text_field( $request['directory'] ) : false,
+			'ids'       => $request['ids'] ? explode( ',', sanitize_text_field( $request['ids'] ) ) : '',
 		);
+
+		if ( $request['search'] ) {
+
+			$params['search'] = sanitize_text_field( $request['search'] );
+
+		}
+		
+
 		$taxonomies = array(
 			'classification' => 'classification',
 			'wsuwp_university_category' => 'university_category',
@@ -68,6 +78,30 @@ class People_Query {
 			'posts_per_page' => strcasecmp( $params['count'], 'All' ) === 0 ? -1 : $params['count'],
 			'paged' => $params['page'],
 		);
+
+
+		if ( ! empty( $params['directory'] ) && empty( $params['ids'] ) ) {
+
+			$people_ids = Directories::get_directory_people_ids( $params['directory'] );
+
+			$args['post__in'] = $people_ids;
+
+			$args['posts_per_page'] = -1;
+
+		}
+
+		if ( ! empty( $params['ids'] ) ) {
+
+			$args['post__in'] = array_map( 'intval', $params['ids'] );
+			$args['posts_per_page'] = -1;
+
+		}
+
+		if ( $params['search'] ) {
+
+			$args['s'] = $params['search'];
+
+		}
 
 		if ( $params['nid'] ) {
 			$args['meta_query'] = array(
