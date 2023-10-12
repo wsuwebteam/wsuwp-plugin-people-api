@@ -2,7 +2,7 @@
 
 class Plugin {
 
-	protected static $version = '1.2.0';
+	protected static $version = '1.2.1';
 
 	public static function get( $property ) {
 
@@ -36,6 +36,8 @@ class Plugin {
 		require_once self::get( 'plugin_dir') . 'classes/directories.php';
 
 		require_once __DIR__ . '/people-query.php';
+
+		require_once __DIR__ . '/directory-query.php';
 
 	}
 
