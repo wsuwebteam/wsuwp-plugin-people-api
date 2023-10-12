@@ -45,8 +45,9 @@ class People_Query {
 			'photo_size' => $request['photo-size'] ? sanitize_text_field( $request['photo-size'] ) : 'medium',
 			'tag'  => sanitize_text_field( $request['tag'] ),
 			'research_interest' => sanitize_text_field( $request['research-interest'] ),
+			'directory_inherit' => ( ! empty( $request['directory_inherit'] ) ) ? sanitize_text_field( $request['directory_inherit'] ) : 'all', // supports none|children|all
 			'directory' => $request['directory'] ? sanitize_text_field( $request['directory'] ) : false,
-			'ids'       => $request['ids'] ? explode( ',', sanitize_text_field( $request['ids'] ) ) : '',
+			'ids'       => $request['ids'] ? explode( ',', sanitize_text_field( $request['ids'] ) ) : array(),
 		);
 
 		if ( $request['search'] ) {
@@ -54,7 +55,6 @@ class People_Query {
 			$params['search'] = sanitize_text_field( $request['search'] );
 
 		}
-		
 
 		$taxonomies = array(
 			'classification' => 'classification',
@@ -79,21 +79,24 @@ class People_Query {
 			'paged' => $params['page'],
 		);
 
+		$directories  = ( ! empty( $params['directory'] ) ) ? Directories::get_directories( $params['directory'], array( 'inherit' => $params['directory_inherit'] ) ) : array();
+		$people_index = ( ! empty( $directories ) ) ? Directories::get_people_directory_index( $directories ) : array();
 
-		if ( ! empty( $params['directory'] ) && empty( $params['ids'] ) ) {
 
-			$people_ids = Directories::get_directory_people_ids( $params['directory'] );
+		if ( ! empty( $directories ) && empty( $params['ids'] ) ) {
+
+			$people_ids = Directories::get_people_ids_from_directories( $directories );
 
 			$args['post__in'] = $people_ids;
 
-			$args['posts_per_page'] = -1;
+			$args['posts_per_page'] = count( $people_ids );
 
 		}
 
 		if ( ! empty( $params['ids'] ) ) {
 
 			$args['post__in'] = array_map( 'intval', $params['ids'] );
-			$args['posts_per_page'] = -1;
+			$args['posts_per_page'] = count( $params['ids'] );
 
 		}
 
@@ -165,7 +168,7 @@ class People_Query {
 					'degree' => self::get_first_post_meta( $id, array( 'wsuwp_degree', '_wsuwp_fallback_degree', '_wsuwp_profile_degree' ) ),
 					'website' => self::custom_trim( self::get_first_post_meta( $id, array( 'wsuwp_website', '_wsuwp_fallback_website', '_wsuwp_profile_website' ) ) ),
 					'bio' => apply_filters( 'the_content', get_the_content() ),
-
+					'directories' => ( array_key_exists( $id, $people_index ) ) ?  $people_index[ $id ] : array(),
 					'classification' => self::get_taxonomy_names( get_the_terms( $id, 'classification' ) ),
 					'category' => array_merge( self::get_taxonomy_names( get_the_terms( $id, 'category' ) ), self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_university_category' ) ) ),
 					'university_location' => self::get_taxonomy_names( get_the_terms( $id, 'wsuwp_university_location' ) ),
