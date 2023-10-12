@@ -35,8 +35,22 @@ class Directories {
 	}
 
 
-	public static function get_directory( $directory, $args = array() ) {
+	public static function get_directories_from_posts( $posts ) {
 
+		$directories = array();
+
+		foreach ( $posts as $directory ) {
+
+			$directories[] = self::get_directory( $directory );
+
+		}
+
+		return $directories;
+
+	}
+
+
+	public static function get_directory( $directory, $args = array() ) {
 
 		if ( ! $directory instanceof \WP_Post ) {
 
@@ -241,7 +255,30 @@ class Directories {
 
 		self::directory_parent_recursive( $directory_path_array, $directory_id );
 
-		return $directory_path_array;
+		return array_reverse( $directory_path_array );
+
+	}
+
+
+	public static function get_directory_search( $term ) {
+
+		$results = array();
+
+		$query_args = array(
+			's'              => $term,
+			'post_type'      => self::$post_type,
+			'posts_per_page' => 50,
+		);
+
+		$directories = get_posts( $query_args );
+
+		if ( ! empty( $directories ) ) {
+
+			$results = self::get_directories_from_posts( $directories );
+		}
+
+
+		return $results;
 
 	}
 
