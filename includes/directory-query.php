@@ -68,6 +68,16 @@ class Directory_Query {
 			)
 		);
 
+		register_rest_route(
+			'peopleapi/v1',
+			'/directory/search',
+			array(
+				'methods' => \WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_directory_search' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
 	}
 
 
@@ -143,6 +153,30 @@ class Directory_Query {
 		}
 
 		return new \WP_REST_Response( $children, 200 );
+
+	}
+
+
+	/**
+	 * Get Directory
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function get_directory_search( \WP_REST_Request $request ) {
+
+
+		$directories = array();
+
+		$term = ( ! empty( $request['term'] ) ) ? $request['term'] : '';
+
+		if ( ! empty( $term ) ) {
+
+			$directories = Directories::get_directory_search( $term );
+
+		}
+
+		return new \WP_REST_Response( $directories, 200 );
 
 	}
 
