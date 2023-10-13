@@ -262,7 +262,13 @@ class Directories {
 	}
 
 
-	public static function get_directory_search( $term ) {
+	public static function get_directory_search( $term, $args = array() ) {
+
+		$default_args = array(
+			'inherit_children' => false, // supports true|false
+		);
+
+		self::parse_args( $default_args, $args );
 
 		$results = array();
 
@@ -279,6 +285,13 @@ class Directories {
 			$results = self::get_directories_from_posts( $directories );
 		}
 
+		if ( ! empty( $directories ) && 1 === count( $directories ) && ! empty( $args['inherit_children'] ) ) {
+
+			$child_directories = self::get_directories( $directories[0]->ID, array( 'include_parent' => false ) );
+
+			$results = array_merge( $results, $child_directories );
+
+		}
 
 		return $results;
 
