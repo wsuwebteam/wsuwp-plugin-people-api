@@ -169,10 +169,11 @@ class Directory_Query {
 		$directories = array();
 
 		$term = ( ! empty( $request['term'] ) ) ? $request['term'] : '';
+		$inherit = ( ! empty( $request['inherit_children'] ) ) ? $request['inherit_children'] : false;
 
 		if ( ! empty( $term ) ) {
 
-			$directories = Directories::get_directory_search( $term );
+			$directories = Directories::get_directory_search( $term, array( 'inherit_children' => $inherit ) );
 
 		}
 

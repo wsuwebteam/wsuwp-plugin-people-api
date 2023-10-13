@@ -253,14 +253,22 @@ class Directories {
 
 		$directory_path_array = array();
 
-		self::directory_parent_recursive( $directory_path_array, $directory_id );
+		$directory = get_post( $directory_id );
+
+		self::directory_parent_recursive( $directory_path_array, $directory );
 
 		return array_reverse( $directory_path_array );
 
 	}
 
 
-	public static function get_directory_search( $term ) {
+	public static function get_directory_search( $term, $args = array() ) {
+
+		$default_args = array(
+			'inherit_children' => false, // supports true|false
+		);
+
+		self::parse_args( $default_args, $args );
 
 		$results = array();
 
@@ -277,26 +285,38 @@ class Directories {
 			$results = self::get_directories_from_posts( $directories );
 		}
 
+		if ( ! empty( $directories ) && 1 === count( $directories ) && ! empty( $args['inherit_children'] ) ) {
+
+			$child_directories = self::get_directories( $directories[0]->ID, array( 'include_parent' => false ) );
+
+			$results = array_merge( $results, $child_directories );
+
+		}
 
 		return $results;
 
 	}
 
 
-	public function directory_parent_recursive( &$directory_path, $directory_id ) {
+	public function directory_parent_recursive( &$directory_path, $directory) {
 
-		$parent_post = get_post_parent( $directory_id );
+		// $parent_post = get_post_parent( $directory_id ); NOt supported in 5.6
 
-		if ( $parent_post ) {
+		if ( $directory ) {
 
-			$directory_path[] = array( 
-				'title' => $parent_post->post_title,
-				'post_id' => $parent_post->ID,
-				'editLink'   => admin_url() . '/post.php?post=' . $directory->ID . '&action=edit',
-			);
+			$parent_post = get_post( $directory->post_parent );
 
-			self::directory_parent_recursive( $directory_path, $parent_post->ID );
+			if ( $parent_post ) {
 
+				$directory_path[] = array( 
+					'title' => $parent_post->post_title,
+					'post_id' => $parent_post->ID,
+					'editLink'   => admin_url() . '/post.php?post=' . $directory->ID . '&action=edit',
+				);
+
+				self::directory_parent_recursive( $directory_path, $parent_post );
+
+			}
 		}
 
 	}
