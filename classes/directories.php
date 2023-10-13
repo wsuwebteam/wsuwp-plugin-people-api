@@ -253,7 +253,9 @@ class Directories {
 
 		$directory_path_array = array();
 
-		self::directory_parent_recursive( $directory_path_array, $directory_id );
+		$directory = get_post( $directory_id );
+
+		self::directory_parent_recursive( $directory_path_array, $directory );
 
 		return array_reverse( $directory_path_array );
 
@@ -283,20 +285,25 @@ class Directories {
 	}
 
 
-	public function directory_parent_recursive( &$directory_path, $directory_id ) {
+	public function directory_parent_recursive( &$directory_path, $directory) {
 
-		$parent_post = get_post_parent( $directory_id );
+		// $parent_post = get_post_parent( $directory_id ); NOt supported in 5.6
 
-		if ( $parent_post ) {
+		if ( $directory ) {
 
-			$directory_path[] = array( 
-				'title' => $parent_post->post_title,
-				'post_id' => $parent_post->ID,
-				'editLink'   => admin_url() . '/post.php?post=' . $directory->ID . '&action=edit',
-			);
+			$parent_post = get_post( $directory->post_parent );
 
-			self::directory_parent_recursive( $directory_path, $parent_post->ID );
+			if ( $parent_post ) {
 
+				$directory_path[] = array( 
+					'title' => $parent_post->post_title,
+					'post_id' => $parent_post->ID,
+					'editLink'   => admin_url() . '/post.php?post=' . $directory->ID . '&action=edit',
+				);
+
+				self::directory_parent_recursive( $directory_path, $parent_post );
+
+			}
 		}
 
 	}
