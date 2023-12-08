@@ -393,6 +393,30 @@ class People_Query {
 	 * @return array<WP_Term>
 	 */
 	public static function search_terms( \WP_REST_Request $request ) {
+
+		$type = ( ! empty( $request['type'] ) ) ? sanitize_text_field( $request['type'] ) : 'taxonomy';
+
+		switch ( $type ) {
+
+			case 'post':
+				$terms = self::get_search_posts_as_terms( $request );
+				break;
+			default:
+				$terms = self::get_search_terms( $request );
+				break;
+		};
+
+		return $terms;
+	}
+
+
+	/**
+	 * search_terms
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return array<WP_Term>
+	 */
+	public static function get_search_terms( \WP_REST_Request $request ) {
 		$terms = array();
 		$params = array(
 			'count' => $request['count'] ? sanitize_text_field( $request['count'] ) : 20,
@@ -433,6 +457,36 @@ class People_Query {
 					'slug' => $result->slug,
 					'taxonomy' => $result->taxonomy,
 				)
+			);
+		}
+
+		return $terms;
+	}
+
+
+	/**
+	 * search_terms
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return array<WP_Term>
+	 */
+	public static function get_search_posts_as_terms( \WP_REST_Request $request ) {
+		$terms = array();
+		$args = array(
+			'posts_per_page' => $request['count'] ? sanitize_text_field( $request['count'] ) : 20,
+			'post_type'      => sanitize_text_field( $request['taxonomy'] ),
+			's'              => sanitize_text_field( $request['s'] ),
+		);
+
+		$results = get_posts( $args );
+
+		foreach ( $results as $result ) {
+
+			$terms[] = array(
+				'term_id'  => $result->ID,
+				'name'     => $result->post_title,
+				'slug'     => $result->post_name,
+				'taxonomy' => $result->post_type,
 			);
 		}
 
