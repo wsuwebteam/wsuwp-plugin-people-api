@@ -465,13 +465,16 @@ class People_Query {
 
 
 	/**
-	 * search_terms
+	 * get_search_posts_as_terms
 	 *
 	 * @param \WP_REST_Request $request
 	 * @return array<WP_Term>
 	 */
 	public static function get_search_posts_as_terms( \WP_REST_Request $request ) {
 		$terms = array();
+
+		$show_parent = ( ! empty( $request['show_parent'] ) ) ? rest_sanitize_boolean( $request['show_parent'] ) : false;
+
 		$args = array(
 			'posts_per_page' => $request['count'] ? sanitize_text_field( $request['count'] ) : 20,
 			'post_type'      => sanitize_text_field( $request['taxonomy'] ),
@@ -482,12 +485,23 @@ class People_Query {
 
 		foreach ( $results as $result ) {
 
-			$terms[] = array(
+			$term = array(
 				'term_id'  => $result->ID,
 				'name'     => $result->post_title,
 				'slug'     => $result->post_name,
 				'taxonomy' => $result->post_type,
 			);
+
+
+			if ( ! empty( $show_parent ) && ! empty( $result->post_parent ) ) {
+
+				$parent = get_post( $result->post_parent );
+
+				$term['name'] = $term['name'] . ' // ' . $parent->post_title;
+
+			}
+
+			$terms[] = $term;
 		}
 
 		return $terms;
